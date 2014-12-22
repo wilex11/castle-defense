@@ -51,6 +51,7 @@ class PygView(object):
         self.cannonballgroup=pygame.sprite.Group()
         self.bargroup=pygame.sprite.Group()
         self.monstergroup=pygame.sprite.Group()
+        self.arrowgroup=pygame.sprite.Group()
         
         
         Cannon.groups=self.cannongroup, self.allgroup
@@ -60,6 +61,9 @@ class PygView(object):
         Reloadingbar.groups=self.bargroup,self.allgroup
         Hitpointbar.groups=self.bargroup,self.allgroup
         Monster.groups=self.monstergroup,self.allgroup
+        Arrow.groups=self.arrowgroup,self.allgroup
+        
+        
         
         Cannon(750,240,180)
         Cannon(750,440,180)
@@ -67,6 +71,8 @@ class PygView(object):
         Cannon(950,240,180)
         
         self.archer1=Archer(500,100)
+        Archer(500,470)
+        Archer(500,301)
         
         self.cross1=Crosshair()     
 
@@ -129,12 +135,21 @@ class PygView(object):
                     if event.key == pygame.K_ESCAPE:
                         running = False
             # mouse button pressed ?
-            if pygame.mouse.get_pressed()[0]:
+            if pygame.mouse.get_pressed()[2]:
                 for cannon in self.cannongroup:
                     cannon.shoot(
                                  pygame.mouse.get_pos()[0],
                                  pygame.mouse.get_pos()[1])
-            
+                                 
+            if pygame.mouse.get_pressed()[0]:
+                for archer in self.archergroup:
+                    archer.shoot(
+                                 pygame.mouse.get_pos()[0],
+                                 pygame.mouse.get_pos()[1])
+                                 
+                                 
+                                 
+                                                
             pressedkeys = pygame.key.get_pressed()
             if pressedkeys[pygame.K_r]:
                 for cannon in self.cannongroup:
@@ -143,7 +158,14 @@ class PygView(object):
                                       cannon.maxrange,1)
                     pygame.draw.circle(self.screen,(134,39,124),
                                       (cannon.x,cannon.y),
-                                      cannon.minrange,1)
+                                       cannon.minrange,1)
+                for archer in self.archergroup:
+                    pygame.draw.circle(self.screen,(13,100,21),
+                                      (archer.x, archer.y),
+                                       archer.maxrange,1)
+                    pygame.draw.circle(self.screen,(108,120,21),
+                                      (archer.x,archer.y),
+                                       archer.minrange,0)              
                                       
             if random.random()<0.01:
                 Monster(0,random.randint(0,PygView.screeny))                          
@@ -162,11 +184,20 @@ class PygView(object):
                 crashgroup = pygame.sprite.spritecollide(ball, self.monstergroup,
                                                           False)
                 for crashmonster in crashgroup:
-                    print("teste:", ball.z, ball.killzone)
+                   #print("teste:", ball.z, ball.killzone)
                     # kugel tief genug?
                     if ball.z < ball.killzone:
                        crashmonster.hitpoints -= 50 
-            
+                       
+            for arrow in self.arrowgroup:
+                crashgroup = pygame.sprite.spritecollide(arrow, self.monstergroup,
+                                                         False)
+                
+                for crashmonster in crashgroup:                                          
+                    if arrow.z<arrow.killzone:
+                        crashmonster.hitpoints -=30
+                        
+                
             
             pygame.display.flip()
             self.screen.blit(self.background, (0, 0))
@@ -205,7 +236,7 @@ class Monster(pygame.sprite.Sprite):
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.dx = random.randint(10,15)
-        self.dy = 0
+        self.dy = random.randint(-10,10)
         #self.maxspeed = 1.5
         self.x = x
         self.y = y
@@ -218,12 +249,20 @@ class Monster(pygame.sprite.Sprite):
     def update(self, seconds):
          self.x += self.dx * seconds
          self.y += self.dy * seconds
+         if self.y<0:
+             self.y=10
+             self.dy*=-1
+         if self.y>PygView.screeny:
+             self.y=PygView.screeny-10
+             self.dy*=-1
+                 
          self.rect.centerx = round(self.x,0)
          self.rect.centery = round(self.y,0)
          #self.dx*=self.maxspeed
          #self.dy*=self.maxspeed
          if self.hitpoints<0:
-             self.kill()	
+             self.kill()
+                
              
             
             
@@ -248,6 +287,8 @@ class Archer (pygame.sprite.Sprite):
         pygame.draw.arc(self.image,(18,11,11),(0,10,150,150),math.pi,20,5)
         pygame.draw.circle(self.image,(95,13,3),(45,45),5)
         pygame.draw.circle(self.image,(95,13,3),(45,55),5)
+        self.maxrange = random.randint(100,300)
+        self.minrange = 0
         
         
         self.rect=self.image.get_rect()
@@ -260,6 +301,27 @@ class Archer (pygame.sprite.Sprite):
     def update(self,seconds):
         self.rect.centerx=self.x
         self.rect.centery=self.y
+    
+    def checkrange(self, x, y):
+        distancex = x - self.x
+        distancey = y - self.y
+        distance = ( distancex**2 + distancey**2)**0.5
+        if distance<self.maxrange and distance>self.minrange:
+            return True
+        else:
+            return False    
+        
+    def shoot(self, x, y):
+        if self.checkrange(x, y):
+            
+            
+            #if self.reloading <= 0:
+                Arrow( self.x, self.y, x, y)
+               # self.reloading=self.reloadtime  
+                
+            
+                
+        
         
         
 class Crosshair(pygame.sprite.Sprite):
@@ -333,6 +395,64 @@ class Cannonball(pygame.sprite.Sprite):
          self.rect.centerx = self.x
          self.rect.centery = self.y
          self.dz+=self.gravity
+         
+         
+class Arrow (pygame.sprite.Sprite):
+    def __init__(self, x,y, targetx, targety):
+        pygame.sprite.Sprite.__init__(self,self.groups) #!!!!!!!!!!
+        self.image0=pygame.Surface((20,20))
+        pygame.draw.line(self.image0,(100,83,81),(0,10),(20,10),3)
+        self.image0.set_colorkey((0,0,0))
+        self.image0=self.image0.convert_alpha()
+        self.rect = self.image0.get_rect()
+        self.image=self.image0.copy()
+        self.gravity=-9.81
+        self.x=x
+        self.y=y
+        self.z=0
+        self.dx=0
+        self.dy=0
+        self.dz=0.7
+        self.killzone = 300.0 # Höhe, ab wann kugel monster tötet
+        self.maxspeed = 10.5
+        self.targetx = targetx
+        self.targety = targety
+        distancex = self.targetx - self.x
+        distancey = self.targety - self.y
+        distance = ( distancex**2 + distancey**2)**0.5
+        try:
+            self.dz = 10.3* ((self.gravity*-1)/(2*self.maxspeed**2 )) * distance
+            #self.dz=0.7
+        except:
+            print("division by zero?")
+        self.dx = distancex / distance
+        self.dy = distancey / distance
+        self.dx *= self.maxspeed
+        self.dy *= self.maxspeed  
+        
+    def update(self, seconds):
+        self.x=self.x + self.dx
+        self.y=self.y + self.dy
+        self.z=self.z + self.dz
+        if self.x < 0:
+            self.kill()
+        if self.y < 0:
+            self.kill()
+        if self.x> PygView.screenx:
+            self.kill()
+        if self.y> PygView.screeny:
+            self.kill()     
+        if self.z < 0:
+            self.kill()             
+        self.image=pygame.transform.rotozoom(self.image0, 0, 1+self.z/1000.0)   
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.x
+        self.rect.centery = self.y
+        self.dz+=self.gravity
+         
+        
+        
+    
          
          
      
