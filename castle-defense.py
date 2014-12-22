@@ -52,16 +52,20 @@ class PygView(object):
         self.bargroup=pygame.sprite.Group()
         self.monstergroup=pygame.sprite.Group()
         self.arrowgroup=pygame.sprite.Group()
+        self.friendlyprojectilegroup=pygame.sprite.Group()
+        
         
         
         Cannon.groups=self.cannongroup, self.allgroup
         Archer.groups=self.archergroup, self.allgroup
         Crosshair.groups=self.crosshairgroup, self.allgroup 
-        Cannonball.groups=self.cannonballgroup, self.allgroup
+        Cannonball.groups=self.cannonballgroup, self.allgroup,self.friendlyprojectilegroup
         Reloadingbar.groups=self.bargroup,self.allgroup
         Hitpointbar.groups=self.bargroup,self.allgroup
         Monster.groups=self.monstergroup,self.allgroup
-        Arrow.groups=self.arrowgroup,self.allgroup
+        Arrow.groups=self.arrowgroup,self.allgroup,self.friendlyprojectilegroup
+        
+        
         
         
         
@@ -180,22 +184,29 @@ class PygView(object):
 
             
             #cannonball vs Monster
-            for ball in self.cannonballgroup:
-                crashgroup = pygame.sprite.spritecollide(ball, self.monstergroup,
-                                                          False)
-                for crashmonster in crashgroup:
-                   #print("teste:", ball.z, ball.killzone)
-                    # kugel tief genug?
-                    if ball.z < ball.killzone:
-                       crashmonster.hitpoints -= 50 
+            #for ball in self.cannonballgroup:
+                #crashgroup = pygame.sprite.spritecollide(ball, self.monstergroup,
+                                                          #False)
+                #for crashmonster in crashgroup:
+                   ##print("teste:", ball.z, ball.killzone)
+                    ## kugel tief genug?
+                    #if ball.z < ball.killzone:
+                       #crashmonster.hitpoints -= 50 
                        
-            for arrow in self.arrowgroup:
-                crashgroup = pygame.sprite.spritecollide(arrow, self.monstergroup,
-                                                         False)
+            #for arrow in self.arrowgroup:
+                #crashgroup = pygame.sprite.spritecollide(arrow, self.monstergroup,
+                                                         #False)
                 
-                for crashmonster in crashgroup:                                          
-                    if arrow.z<arrow.killzone:
-                        crashmonster.hitpoints -=30
+                #for crashmonster in crashgroup:                                          
+                    #if arrow.z<arrow.killzone:
+                        #crashmonster.hitpoints -=30
+            
+            for projectile in self.friendlyprojectilegroup:
+                crashgroup=pygame.sprite.spritecollide(projectile, self.monstergroup,
+                                                False)
+                for crashmonster in crashgroup:
+                    if projectile.z<projectile.killzone:
+                        crashmonster.hitpoints -=projectile.damage                                            
                         
                 
             
@@ -366,6 +377,7 @@ class Cannonball(pygame.sprite.Sprite):
          distancex = self.targetx - self.x
          distancey = self.targety - self.y
          distance = ( distancex**2 + distancey**2)**0.5
+         self.damage=50
          try:
              self.dz = 10.3* ((self.gravity*-1)/(2*self.maxspeed**2 )) * distance
              #self.dz=0.7
@@ -420,6 +432,7 @@ class Arrow (pygame.sprite.Sprite):
         distancex = self.targetx - self.x
         distancey = self.targety - self.y
         distance = ( distancex**2 + distancey**2)**0.5
+        self.damage=30
         try:
             self.dz = 10.3* ((self.gravity*-1)/(2*self.maxspeed**2 )) * distance
             #self.dz=0.7
