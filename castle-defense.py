@@ -246,7 +246,7 @@ class Monster(pygame.sprite.Sprite):
         #self.image = pygame.transform.rotate(self.image,-90)
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
-        self.dx = random.randint(10,15)
+        self.dx = random.randint(30,35)
         self.dy = random.randint(-10,10)
         #self.maxspeed = 1.5
         self.x = x
@@ -302,16 +302,26 @@ class Archer (pygame.sprite.Sprite):
         self.minrange = 0
         
         
+        
         self.rect=self.image.get_rect()
         self.x=x
         self.y=y
         self.rect.centerx=self.x
         self.rect.centery=self.y
+        self.reloadtime=0.2 + random.random()*5
+        self.reloading= 0
+        Reloadingbar(self)
+        self.hitpoints=5
         
         
     def update(self,seconds):
         self.rect.centerx=self.x
         self.rect.centery=self.y
+        if self.reloading > 0:
+            self.reloading -= seconds
+        else:
+            self.reloading = 0
+       
     
     def checkrange(self, x, y):
         distancex = x - self.x
@@ -324,13 +334,15 @@ class Archer (pygame.sprite.Sprite):
         
     def shoot(self, x, y):
         if self.checkrange(x, y):
-            
+            if self.reloading <= 0:
+                Arrow( self.x, self.y,x,y)
+                self.reloading=self.reloadtime  
             
             #if self.reloading <= 0:
                 Arrow( self.x, self.y, x, y)
                # self.reloading=self.reloadtime  
                 
-            
+
                 
         
         
@@ -377,7 +389,7 @@ class Cannonball(pygame.sprite.Sprite):
          distancex = self.targetx - self.x
          distancey = self.targety - self.y
          distance = ( distancex**2 + distancey**2)**0.5
-         self.damage=50
+         self.damage=40
          try:
              self.dz = 10.3* ((self.gravity*-1)/(2*self.maxspeed**2 )) * distance
              #self.dz=0.7
@@ -432,7 +444,8 @@ class Arrow (pygame.sprite.Sprite):
         distancex = self.targetx - self.x
         distancey = self.targety - self.y
         distance = ( distancex**2 + distancey**2)**0.5
-        self.damage=30
+        self.damage=3
+        
         try:
             self.dz = 10.3* ((self.gravity*-1)/(2*self.maxspeed**2 )) * distance
             #self.dz=0.7
