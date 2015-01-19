@@ -53,6 +53,7 @@ class PygView(object):
         self.monstergroup=pygame.sprite.Group()
         self.arrowgroup=pygame.sprite.Group()
         self.friendlyprojectilegroup=pygame.sprite.Group()
+        self.kratergroup=pygame.sprite.Group()
         
         
         
@@ -64,6 +65,7 @@ class PygView(object):
         Hitpointbar.groups=self.bargroup,self.allgroup
         Monster.groups=self.monstergroup,self.allgroup
         Arrow.groups=self.arrowgroup,self.allgroup,self.friendlyprojectilegroup
+        Krater.groups=self.kratergroup,self.allgroup
         
         
         
@@ -365,6 +367,65 @@ class Crosshair(pygame.sprite.Sprite):
         #print(self.rect.center)
         #self.rect.centerx=self.x
         #self.rect.centery=self.y
+
+class Krater(pygame.sprite.Sprite):
+    images = []
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.image=pygame.Surface((100,100))
+        self.rect=self.image.get_rect()
+        pygame.draw.circle(self.image,(56,23,1),(50,50),6) # krater
+        Krater.images.append(self.image) # 0
+        for a in range(8):
+            
+            pygame.draw.circle(self.image,(56,23,1),(random.randint(40,60),
+                                                     random.randint(40,60)),1)
+        Krater.images.append(self.image)  # image[1]
+        self.image=pygame.Surface((100,100))
+        pygame.draw.circle(self.image,(56,23,1),(50,50),8)
+        for a in range(8):
+            pygame.draw.circle(self.image,(56,23,1),(random.randint(30,70),
+                                                     random.randint(30,70)),1)
+        Krater.images.append(self.image)   #image[2]
+        self.image=pygame.Surface((100,100))
+        pygame.draw.circle(self.image,(56,23,1),(50,50),8)
+        for a in range(8):
+            
+            pygame.draw.circle(self.image,(56,23,1),(random.randint(20,80),
+                                                     random.randint(20,80)),1) 
+                                                     
+        Krater.images.append(self.image)  #image[3]
+        self.image=pygame.Surface((100,100))                                             
+        pygame.draw.circle(self.image,(56,23,1),(50,50),8)
+        Krater.images.append(self.image)  # 4
+        
+        self.image = Krater.images[0]
+        self.rect.centerx = self.x
+        self.rect.centery = self.y
+        self.time= 0.00
+                                                     
+    def update(self, seconds):
+        self.time += seconds
+        if self.time < 0.5:
+            self.image = Krater.images[0]
+        elif self.time < 1.0:
+            self.image = Krater.images[1]
+        elif self.time < 1.5:
+            self.image = Krater.images[2]
+        elif self.time < 2.0:
+            self.image = Krater.images[3]
+        elif self.time < 2.5:
+            self.image = Krater.images[4]
+        #elif self.time < 3.0:       
+        #    self.image = Krater.images[4]
+        else:
+            self.paint_into_background()
+            self.kill()
+                              
+    def paint_into_background(self) :
+        pass
+                
         
 class Cannonball(pygame.sprite.Sprite):
      def __init__(self, x,y,targetx,targety):
@@ -413,7 +474,8 @@ class Cannonball(pygame.sprite.Sprite):
          if self.y> PygView.screeny:
              self.kill()     
          if self.z < 0:
-             self.kill()             
+             self.kill() 
+             Krater(self.x,self.y)            
          self.image=pygame.transform.rotozoom(self.image0, 0, 1+self.z/1000.0)   
          self.rect = self.image.get_rect()
          self.rect.centerx = self.x
@@ -572,7 +634,7 @@ class Cannon (pygame.sprite.Sprite):
         self.rect=self.image.get_rect()
         self.maxrange = random.randint(200,700)
         self.minrange = random.randint(50,100)
-        self.hitpoints = 20
+        self.hitpoints = 15
         self.x=x
         self.y=y
         self.dx=0.0
@@ -645,3 +707,4 @@ if __name__ == '__main__':
 
     # call with width of window and fps
     PygView().run()
+
