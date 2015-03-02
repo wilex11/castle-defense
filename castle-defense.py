@@ -37,8 +37,9 @@ class PygView(object):
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.DOUBLEBUF)
-        self.background = pygame.Surface(self.screen.get_size()).convert()  
-        self.background.fill((255,255,255)) # fill background white
+        PygView.background = pygame.Surface(self.screen.get_size()).convert()  
+        PygView.background.fill((255,255,255)) # fill background white
+        #PygView.background = self.background
         self.clock = pygame.time.Clock()
         self.fps = fps
         self.playtime = 0.0
@@ -87,34 +88,34 @@ class PygView(object):
         #------- try out some pygame draw functions --------
         # pygame.draw.rect(Surface, color, Rect, width=0): return Rect
         # burg
-        pygame.draw.rect(self.background, (0,255,0), (750,240,200,200)) # rect: (x1, y1, width, height)
+        pygame.draw.rect(PygView.background, (0,255,0), (750,240,200,200)) # rect: (x1, y1, width, height)
         # pygame.draw.circle(Surface, color, pos, radius, width=0): return Rect
         # turm
-        pygame.draw.circle(self.background, (0,200,0), (750,240), 50) # turm links oben
-        pygame.draw.circle(self.background, (0,200,0), (750,440), 50) # turm links oben
-        pygame.draw.circle(self.background, (0,200,0), (950,440), 50) # turm links oben
-        pygame.draw.circle(self.background, (0,200,0), (950,240), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (750,240), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (750,440), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (950,440), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (950,240), 50) # turm links oben
         # pygame.draw.arc(Surface, color, Rect, start_angle, stop_angle, width=1): return Rect
         # mauer
-        pygame.draw.arc(self.background, (0,150,0),(600,0,150,600), math.pi/2,math.pi*1.5,10) 
+        pygame.draw.arc(PygView.background, (0,150,0),(600,0,150,600), math.pi/2,math.pi*1.5,10) 
         # wasser
-        pygame.draw.arc(self.background, (5,66,156),(570,-20,150,620), math.pi/2,math.pi*1.5,20) 
+        pygame.draw.arc(PygView.background, (5,66,156),(570,-20,150,620), math.pi/2,math.pi*1.5,20) 
         # ------------------- blitting a Ball --------------
         # pygame.draw.polygon(Surface, color, pointlist, width=0): return Rect
-        pygame.draw.polygon(self.background, (0,180,0), ((500,20),
+        pygame.draw.polygon(PygView.background, (0,180,0), ((500,20),
                                                          (400,100),
                                                          (500,180),
                                                          (420,100),
                                                          (500,20)
                                                          ))
-        pygame.draw.polygon(self.background, (0,180,0), ((500,220),
+        pygame.draw.polygon(PygView.background, (0,180,0), ((500,220),
                                                          (400,300),
                                                          (500,380),
                                                          (420,300),
                                                          (500,220
                                                          )
                                                          ))   
-        pygame.draw.polygon(self.background, (0,180,0), ((500,390),
+        pygame.draw.polygon(PygView.background, (0,180,0), ((500,390),
                                                          (400,470),
                                                          (500,550),
                                                          (420,470),
@@ -140,6 +141,20 @@ class PygView(object):
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
+                        
+                    if event.key == pygame.K_m:   # mass destruction
+                        for mymonster in self.monstergroup:
+                            mymonster.hitpoints=-1
+                            
+                    if event.key == pygame.K_p:   # mass poison
+                       for mymonster in self.monstergroup:
+                           mymonster.poison=random.randint(5,  100)        
+                            
+                    if event.key == pygame.K_w:   # wave of monsters
+						for x in range(100):
+							Monster(0,random.randint(0,PygView.screeny))      
+                            
+                   
             # mouse button pressed ?
             if pygame.mouse.get_pressed()[2]:
                 for cannon in self.cannongroup:
@@ -213,8 +228,8 @@ class PygView(object):
                 
             
             pygame.display.flip()
-            self.screen.blit(self.background, (0, 0))
-            
+            #self.screen.blit(self.background, (0, 0))
+            self.screen.blit(PygView.background, (0,0))
             self.allgroup.update(seconds)
             self.allgroup.draw(self.screen)
             
@@ -232,24 +247,58 @@ class Monster(pygame.sprite.Sprite):
     
     def __init__(self,x,y,winkel=0):
         pygame.sprite.Sprite.__init__(self,self.groups)
-        self.image=pygame.Surface((100,100))
-        self.image.set_colorkey((0, 0, 0))
+        self.shield=True
+        self.image_attack=pygame.Surface((100,100))
+        self.image_attack.set_colorkey((0, 0, 0))
+        
         #body
-        pygame.draw.circle(self.image,(33, 55, 33),(50,50),50)
+        pygame.draw.circle(self.image_attack,(33, 55, 33),(50,50),39)
         #head 
-        pygame.draw.circle(self.image,(0, 35, 0),(45,50),20)
+        pygame.draw.circle(self.image_attack,(0, 35, 0),(45,50),20)
         #left arm
-        pygame.draw.rect(self.image,(113, 9, 9),(50,20,50,10))
+        pygame.draw.rect(self.image_attack,(113, 9, 9),(50,20,50,10))
         # right arm
-        pygame.draw.rect(self.image,(113, 9, 9),(50,80,50,10))
+        pygame.draw.rect(self.image_attack,(113, 9, 9),(50,80,50,10))
         # left eye
-        pygame.draw.rect(self.image,(255,0,8),(50,40,10.10,5))
-        pygame.draw.rect(self.image,(255,0,8),(50,60,10.10,5))
+        pygame.draw.rect(self.image_attack,(255,0,8),(50,40,10.10,5))
+        #right eye
+        pygame.draw.rect(self.image_attack,(255,0,8),(50,60,10.10,5))
         #self.image = pygame.transform.rotate(self.image,-90)
-        self.image.convert_alpha()
+        self.image_attack.convert_alpha()
+        
+        
+        
+        #------------------
+         
+        self.image_shield=pygame.Surface((100,100))#
+        self.image_shield.set_colorkey((0,0,0))
+         #body
+        pygame.draw.circle(self.image_shield,(33, 55, 33),(50,50),39)  
+        #head                                                                                                                                                                                                                   
+        pygame.draw.circle(self.image_shield,(0, 35, 0),(45,50),20)                                                                                                                                                             
+        #left arm
+        pygame.draw.rect(self.image_shield,(113, 9, 9),(50,20,50,10))
+        # right arm
+        pygame.draw.rect(self.image_shield,(113, 9, 9),(50,80,50,10))
+        # left eye
+        pygame.draw.rect(self.image_shield,(255,0,8),(50,40,10.10,5))
+        #right eye
+        pygame.draw.rect(self.image_shield,(255,0,8),(50,60,10.10,5))
+        #shield
+        pygame.draw.arc(self.image_shield,(134,134,134),(10,10,90,90),-math.pi/2,+math.pi/2,5)
+        
+        
+        # -------------------
+        self.image = self.image_shield
+        
         self.rect = self.image.get_rect()
         self.dx = random.randint(30,35)
         self.dy = random.randint(-10,10)
+        self.time=0.0
+        self.shield_duration=2+random.random()*2
+        self.attack_duration=0.6+random.random()
+        
+        self.poison=0
         #self.maxspeed = 1.5
         self.x = x
         self.y = y
@@ -258,23 +307,48 @@ class Monster(pygame.sprite.Sprite):
         self.hitpoints=random.randint(50,80)*1.0
         self.maxhitpoints=100.0
         Hitpointbar(self)
+        
      
     def update(self, seconds):
-         self.x += self.dx * seconds
-         self.y += self.dy * seconds
-         if self.y<0:
-             self.y=10
-             self.dy*=-1
-         if self.y>PygView.screeny:
-             self.y=PygView.screeny-10
-             self.dy*=-1
-                 
-         self.rect.centerx = round(self.x,0)
-         self.rect.centery = round(self.y,0)
+        
+        self.time += seconds
+        if self.shield:
+            
+            
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
+        
+            if self.time>self.shield_duration:
+               self.shield = False
+               self.time= 0
+        else:
+            if self.time> self.attack_duration:
+                self.shield=True
+                self.time=0
+        if self.poison>0:
+            self.hitpoints-=1
+            if random.randint(0, 100) <50:
+                self.poison-=1
+                
+                
+        
+        if self.y<0:
+            self.y=10
+            self.dy*=-1          
+          
+        if self.y>PygView.screeny:
+            self.y=PygView.screeny-10
+            self.dy*=-1
+         
+        self.rect.centerx = round(self.x,0)
+        self.rect.centery = round(self.y,0)
+                
+              
+                
          #self.dx*=self.maxspeed
          #self.dy*=self.maxspeed
-         if self.hitpoints<0:
-             self.kill()
+        if self.hitpoints<0:
+            self.kill()
                 
              
             
@@ -369,62 +443,55 @@ class Crosshair(pygame.sprite.Sprite):
         #self.rect.centery=self.y
 
 class Krater(pygame.sprite.Sprite):
-    images = []
+    #images = []
     def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x
         self.y = y
-        self.image=pygame.Surface((100,100))
-        self.rect=self.image.get_rect()
-        pygame.draw.circle(self.image,(56,23,1),(50,50),6) # krater
-        Krater.images.append(self.image) # 0
-        for a in range(8):
-            
-            pygame.draw.circle(self.image,(56,23,1),(random.randint(40,60),
-                                                     random.randint(40,60)),1)
-        Krater.images.append(self.image)  # image[1]
-        self.image=pygame.Surface((100,100))
-        pygame.draw.circle(self.image,(56,23,1),(50,50),8)
-        for a in range(8):
-            pygame.draw.circle(self.image,(56,23,1),(random.randint(30,70),
-                                                     random.randint(30,70)),1)
-        Krater.images.append(self.image)   #image[2]
-        self.image=pygame.Surface((100,100))
-        pygame.draw.circle(self.image,(56,23,1),(50,50),8)
-        for a in range(8):
-            
-            pygame.draw.circle(self.image,(56,23,1),(random.randint(20,80),
-                                                     random.randint(20,80)),1) 
-                                                     
-        Krater.images.append(self.image)  #image[3]
-        self.image=pygame.Surface((100,100))                                             
-        pygame.draw.circle(self.image,(56,23,1),(50,50),8)
-        Krater.images.append(self.image)  # 4
+        self.images = []
+        for i in ((40,60),(30,70),(20,80),(15,85),(10,90),(5,95)):
+            self.image=pygame.Surface((100,100))
+            self.rect=self.image.get_rect()
+            pygame.draw.circle(self.image,(56,23,1),(50,50),6) # krater
+            #self.images.append(self.image) # 0
+            for a in range(int(i[1]/10)):
+                pygame.draw.circle(self.image,(56,23,1),(random.randint(i[0],i[1]),
+                                                     random.randint(i[0],i[1])),1)
+            self.image.set_colorkey((0,0,0))
+            self.image=self.image.convert_alpha()
+            self.images.append(self.image)  # image[1]
         
-        self.image = Krater.images[0]
+        self.image = self.images[0]
+        self.rect = self.image.get_rect()
         self.rect.centerx = self.x
         self.rect.centery = self.y
         self.time= 0.00
                                                      
     def update(self, seconds):
         self.time += seconds
-        if self.time < 0.5:
-            self.image = Krater.images[0]
-        elif self.time < 1.0:
-            self.image = Krater.images[1]
-        elif self.time < 1.5:
-            self.image = Krater.images[2]
-        elif self.time < 2.0:
-            self.image = Krater.images[3]
-        elif self.time < 2.5:
-            self.image = Krater.images[4]
-        #elif self.time < 3.0:       
-        #    self.image = Krater.images[4]
+        #print("ich bin ein Krater")
+        if self.time < 0.1:            #0.5
+            self.image = self.images[0]
+        elif self.time < 0.2:        #1.0
+            self.image = self.images[1]
+        elif self.time < 0.3:       #1.5
+            self.image = self.images[2]
+        elif self.time < 0.4:      #2.0
+            self.image = self.images[3]
+        elif self.time < 0.5:     #2.5
+            self.image = self.images[4]
+        elif self.time < 0.6:       #3.0
+            self.image = self.images[5]
         else:
             self.paint_into_background()
             self.kill()
+        
                               
     def paint_into_background(self) :
-        pass
+        PygView.background.blit(self.image, (self.x-50, self.y-50))
+        
+        
+        
                 
         
 class Cannonball(pygame.sprite.Sprite):
@@ -475,7 +542,8 @@ class Cannonball(pygame.sprite.Sprite):
              self.kill()     
          if self.z < 0:
              self.kill() 
-             Krater(self.x,self.y)            
+             Krater(self.x,self.y) 
+             #print ("ich mache krater")           
          self.image=pygame.transform.rotozoom(self.image0, 0, 1+self.z/1000.0)   
          self.rect = self.image.get_rect()
          self.rect.centerx = self.x
@@ -576,7 +644,37 @@ class Reloadingbar(pygame.sprite.Sprite):
             if self.boss.hitpoints < 1:   #check if boss is still alive
                 self.kill() # kill the hitbar        
      
-        
+class Poisonbar(pygame.sprite.Sprite):
+        """shows a bar with the poisonpoints of a Bird sprite
+           with a given bossnumber, the Lifebar class can 
+           identify the boos (Bird sprite) with this codeline:
+           Bird.birds[bossnumber] """
+        def __init__(self, boss):
+            #self.groups = allgroup
+            self.boss = boss
+            #self._layer = self.boss._layer
+            pygame.sprite.Sprite.__init__(self, self.groups)
+            self.oldpercent = 0
+            self.paint()
+        def paint(self):
+            self.image = pygame.Surface((self.boss.rect.width,7))
+            self.image.set_colorkey((0,0,0)) # black transparent
+            pygame.draw.rect(self.image, (1,1,1), (0,0,self.boss.rect.width,7),1)
+            self.rect = self.image.get_rect()
+       
+        def update(self, time):
+            self.percent = self.boss.poisonpoints / self.boss.maxpoisonpoints * 1.0
+            if self.percent != self.oldpercent:
+                self.paint() # important ! boss.rect.width may have changed (because rotating)
+                pygame.draw.rect(self.image, (0,0,0), (1,1,self.boss.rect.width-2,5)) # fill black
+                pygame.draw.rect(self.image, (30,240,26), (1,1,
+                                 int(self.boss.rect.width * self.percent),5),0) # fill green
+            self.oldpercent = self.percent
+            self.rect.centerx = self.boss.rect.centerx
+            self.rect.centery = self.boss.rect.centery - self.boss.rect.height /2 - 10
+            if self.boss.poisonpoints < 1:   #check if boss is still alive
+                self.kill() # kill the hitbar        
+             
      
         
             
@@ -707,4 +805,3 @@ if __name__ == '__main__':
 
     # call with width of window and fps
     PygView().run()
-
