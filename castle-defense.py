@@ -151,8 +151,8 @@ class PygView(object):
                            mymonster.poison=random.randint(5,  100)        
                             
                     if event.key == pygame.K_w:   # wave of monsters
-						for x in range(100):
-							Monster(0,random.randint(0,PygView.screeny))      
+                        for x in range(100):
+                            Monster(0,random.randint(0,PygView.screeny))      
                             
                    
             # mouse button pressed ?
@@ -374,7 +374,7 @@ class Archer (pygame.sprite.Sprite):
         pygame.draw.arc(self.image,(18,11,11),(0,10,150,150),math.pi,20,5)
         pygame.draw.circle(self.image,(95,13,3),(45,45),5)
         pygame.draw.circle(self.image,(95,13,3),(45,55),5)
-        self.maxrange = random.randint(100,300)
+        self.maxrange = random.randint(300,400)
         self.minrange = 0
         
         
@@ -555,7 +555,7 @@ class Arrow (pygame.sprite.Sprite):
     def __init__(self, x,y, targetx, targety):
         pygame.sprite.Sprite.__init__(self,self.groups) #!!!!!!!!!!
         self.image0=pygame.Surface((20,20))
-        pygame.draw.line(self.image0,(100,83,81),(0,10),(20,10),3)
+        pygame.draw.line(self.image0,(100,83,81),(10,0),(10,20),3)
         self.image0.set_colorkey((0,0,0))
         self.image0=self.image0.convert_alpha()
         self.rect = self.image0.get_rect()
@@ -585,6 +585,9 @@ class Arrow (pygame.sprite.Sprite):
         self.dy = distancey / distance
         self.dx *= self.maxspeed
         self.dy *= self.maxspeed  
+        self.angle = math.atan2(-self.dx, -self.dy)/math.pi*180.0  # - math.pi/2
+        
+        self.image = pygame.transform.rotozoom(self.image0,self.angle,1.0)
         
     def update(self, seconds):
         self.x=self.x + self.dx
@@ -600,7 +603,8 @@ class Arrow (pygame.sprite.Sprite):
             self.kill()     
         if self.z < 0:
             self.kill()             
-        self.image=pygame.transform.rotozoom(self.image0, 0, 1+self.z/1000.0)   
+        self.image=pygame.transform.rotozoom(self.image0, self.angle, 1+self.z/1000.0)   
+        #self.image = pygame.transform.rotozoom(self.image,self.angle,1.0)
         self.rect = self.image.get_rect()
         self.rect.centerx = self.x
         self.rect.centery = self.y
