@@ -55,7 +55,7 @@ class PygView(object):
         self.arrowgroup=pygame.sprite.Group()
         self.friendlyprojectilegroup=pygame.sprite.Group()
         self.kratergroup=pygame.sprite.Group()
-        
+        self.barrikadegroup=pygame.sprite.Group()
         
         
         Cannon.groups=self.cannongroup, self.allgroup
@@ -66,6 +66,7 @@ class PygView(object):
         Monster.groups=self.monstergroup,self.allgroup
         Arrow.groups=self.arrowgroup,self.allgroup,self.friendlyprojectilegroup
         Krater.groups=self.kratergroup,self.allgroup
+        Barrikade.groups=self.barrikadegroup, self.allgroup
         
         
         
@@ -77,8 +78,18 @@ class PygView(object):
         Cannon(950,240,180)
         
         self.archer1=Archer(500,100)
-        Archer(500,470)
+        Archer(500,540)
         Archer(500,301)
+        
+        Barrikade(440, 260, True)
+        Barrikade(440, 360, False)
+        
+        Barrikade(440, 30, True)
+        Barrikade(440, 130, False)
+        
+        Barrikade(440, 500 , True)
+        Barrikade(440, 600 , False)
+        
         
         self.cross1=Crosshair()     
 
@@ -101,26 +112,26 @@ class PygView(object):
         pygame.draw.arc(PygView.background, (5,66,156),(570,-20,150,620), math.pi/2,math.pi*1.5,20) 
         # ------------------- blitting a Ball --------------
         # pygame.draw.polygon(Surface, color, pointlist, width=0): return Rect
-        pygame.draw.polygon(PygView.background, (0,180,0), ((500,20),
-                                                         (400,100),
-                                                         (500,180),
-                                                         (420,100),
-                                                         (500,20)
-                                                         ))
-        pygame.draw.polygon(PygView.background, (0,180,0), ((500,220),
-                                                         (400,300),
-                                                         (500,380),
-                                                         (420,300),
-                                                         (500,220
-                                                         )
-                                                         ))   
-        pygame.draw.polygon(PygView.background, (0,180,0), ((500,390),
-                                                         (400,470),
-                                                         (500,550),
-                                                         (420,470),
-                                                         (500,390
-                                                         )
-                                                         ))                                                                                                                    
+       # pygame.draw.polygon(PygView.background, (0,180,0), ((500,20),
+             #                                            (400,100),
+             ##                                            (500,180),
+               #                                          (420,100),
+                 #                                       (500,20)
+                     #                                    ))
+       # pygame.draw.polygon(PygView.background, (0,180,0), ((500,220),
+                                    #                     (400,300),
+                                   #                      (500,380),
+                                    #                     (420,300),
+                                  #                       (500,220
+                                   #                      )
+                                    #                     ))   
+        #pygame.draw.polygon(PygView.background, (0,180,0), ((500,390),
+                                            #             (400,470),
+                                            #             (500,550),
+                                            #             (420,470),
+                                             #            (500,390
+                                               #          )
+                                               #          ))                                                                                                                    
                                                                  
         
         
@@ -622,8 +633,32 @@ class Arrow (pygame.sprite.Sprite):
          
         
 class Barrikade(pygame.sprite.Sprite):
-    def __init__(self,x , y):
-        pass
+    def __init__(self,x , y, north=True):
+        pygame.sprite.Sprite.__init__(self,self.groups)
+        self.image=pygame.Surface((100,100))
+        self.north = north
+        self.x = x
+        self.y = y
+        self.hitpoints=500
+        if north:
+            pygame.draw.line(self.image,(144, 144, 144),(0, 100),(100, 0),10)
+        else:
+            pygame.draw.line(self.image,(144, 144, 144),(0, 0),(100, 100),10)
+        self.image.set_colorkey((0,0,0))
+        self.rect=self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+         
+        
+    def update(self, seconds):
+        if self.hitpoints < 0:
+            self.kill()
+        
+        
+        
+        
+        
+        
+        
     
          
 class Bar(pygame.sprite.Sprite):
