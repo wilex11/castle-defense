@@ -77,18 +77,18 @@ class PygView(object):
         Cannon(950,440,180)
         Cannon(950,240,180)
         
-        self.archer1=Archer(500,100)
-        Archer(500,540)
-        Archer(500,301)
+        self.archernorth=Archer(500,40)
+        self.archersouth=Archer(500,600)
+        self.archermiddle=Archer(500,301)
         
         Barrikade(440, 260, True)
         Barrikade(440, 360, False)
         
-        Barrikade(440, 30, True)
-        Barrikade(440, 130, False)
+        #Barrikade(440, 30, True)
+        Barrikade(440, 60, False)
         
-        Barrikade(440, 500 , True)
-        Barrikade(440, 600 , False)
+        Barrikade(440, 580 , True)
+       # Barrikade(440, 600 , False)
         
         
         self.cross1=Crosshair()     
@@ -233,7 +233,19 @@ class PygView(object):
                                                 False)
                 for crashmonster in crashgroup:
                     if projectile.z<projectile.killzone:
-                        crashmonster.hitpoints -=projectile.damage                                            
+                        crashmonster.hitpoints -=projectile.damage  
+                        
+            for b in self.barrikadegroup:
+                crashgroup=pygame.sprite.spritecollide(b, self.monstergroup, False ,pygame.sprite.collide_mask)
+                for crashmonster in crashgroup:
+                        if b.north:
+                            crashmonster.y-=10
+                        else:
+                            crashmonster.y+=10
+                        crashmonster.x-=5
+                             
+                 
+                
                         
                 
             
