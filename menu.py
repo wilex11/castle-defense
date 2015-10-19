@@ -56,7 +56,10 @@ class Menu(object):
         
     def get_text(self):
         """ change into submenu?"""
-        text = self.items[self.aktivitemnumber]
+        try:
+           text = self.items[self.aktivitemnumber]
+        except:
+           text = "root"
         if text in self.menudict:
             self.menuname_old.append(self.menuname)
             self.menuname = text
@@ -154,7 +157,8 @@ class PygView(object):
             milliseconds = self.clock.tick(self.fps)
             self.playtime += milliseconds / 1000.0
             self.draw_text("FPS: {:6.3}{}PLAYTIME: {:6.3} SECONDS".format(
-                           self.clock.get_fps(), " "*5, self.playtime))
+                           self.clock.get_fps(), " "*5, self.playtime), color=(30, 120 ,18))
+            pygame.draw.line(self.screen,(random.randint(0,255),random.randint(0,255), random.randint(0,255)),(50,self.height - 50),(self.width -50,self.height - 50) ,3)             
             self.paint()
             pygame.display.flip()
             self.screen.blit(self.background, (0, 0))
@@ -162,7 +166,10 @@ class PygView(object):
         pygame.quit()
 
 
-    def draw_text(self, text ,x=50 , y=150,color=(0,0,0)):
+    def draw_text(self, text ,x=50 , y=0,color=(27,135,177)):
+        if y==0:
+            y= self.height - 50
+        
         """Center text in window
         """
         fw, fh = self.font.size(text)
