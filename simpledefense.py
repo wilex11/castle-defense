@@ -275,10 +275,9 @@ class Monster(pygame.sprite.Sprite):
     
     def __init__(self,x,y,winkel=0):
         pygame.sprite.Sprite.__init__(self,self.groups)
-        self.shield=True
         self.image_attack=pygame.Surface((100,100))
-        self.image_attack.set_colorkey((0, 0, 0))
-        
+        self.image_attack.fill((255 ,255 ,255))
+        #mAle monster
         #body
         pygame.draw.circle(self.image_attack,(33, 55, 33),(50,50),39)
         #head 
@@ -294,6 +293,7 @@ class Monster(pygame.sprite.Sprite):
         #right eye
         pygame.draw.rect(self.image_attack,(255,0,8),(50,60,10.10,5))
         #self.image = pygame.transform.rotate(self.image,-90)
+        self.image_attack.set_colorkey((255,255,255))
         self.image_attack.convert_alpha()
         
         
@@ -301,7 +301,8 @@ class Monster(pygame.sprite.Sprite):
         #------------------
          
         self.image_shield=pygame.Surface((100,100))#
-        self.image_shield.set_colorkey((0,0,0))
+        self.image_shield.fill((255,255,255))
+        
          #body
         pygame.draw.circle(self.image_shield,(33, 55, 33),(50,50),39)  
         #head                                                                                                                                                                                                                   
@@ -316,10 +317,30 @@ class Monster(pygame.sprite.Sprite):
         pygame.draw.rect(self.image_shield,(255,0,8),(50,60,10.10,5))
         #shield
         pygame.draw.arc(self.image_shield,(134,134,134),(10,10,90,90),-math.pi/2,+math.pi/2,5)
-        
-        
+        self.image_shield.set_colorkey((255,255,255))
+        self.image_attack.convert_alpha()
         # -------------------
+        
         self.image = self.image_shield
+        #self.image_attack.set_colorkey((255, 255, 255))
+        #self.image=self.image_attack.copy()
+        self.x=x
+        self.y=y
+        self.dx=0.0
+        self.dy=0.0
+        self.winkel=winkel
+        self.original=self.image.copy()
+        self.oldrect = self.original.get_rect()
+        self.image=pygame.transform.rotozoom(self.original, winkel, 1.0)
+        self.rect=self.image.get_rect()
+        self.oldrect.centerx = self.x
+        self.oldrect.centery = self.y
+        self.rect.centerx = self.x
+        self.rect.centery = self.y
+        self.shield=True
+        
+        
+        #self.image = self.image_shield#
         
         self.rect = self.image.get_rect()
         self.dx = random.randint(30,35)
@@ -342,6 +363,11 @@ class Monster(pygame.sprite.Sprite):
     def update(self, seconds):
         
         self.time += seconds
+        self.winkel = math.atan2(-self.dx, -self.dy)/math.pi*180.0 
+        self.image = pygame.transform.rotozoom(self.original,self.winkel+90,1.0)
+        self.rect = self.image.get_rect()
+        self.rect.centerx=self.x
+        self.rect.centery=self.y
         if self.shield:
             
             
