@@ -294,7 +294,7 @@ class Monster(pygame.sprite.Sprite):
         pygame.draw.rect(self.image_attack,(255,0,8),(50,60,10.10,5))
         #self.image = pygame.transform.rotate(self.image,-90)
         self.image_attack.set_colorkey((255,255,255))
-        self.image_attack.convert_alpha()
+        self.image_attack=self.image_attack.convert_alpha()
         
         
         
@@ -318,7 +318,7 @@ class Monster(pygame.sprite.Sprite):
         #shield
         pygame.draw.arc(self.image_shield,(134,134,134),(10,10,90,90),-math.pi/2,+math.pi/2,5)
         self.image_shield.set_colorkey((255,255,255))
-        self.image_attack.convert_alpha()
+        self.image_shield=self.image_shield.convert_alpha()
         # -------------------
         
         self.image = self.image_shield
