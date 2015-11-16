@@ -25,7 +25,7 @@ import random
 class PygView(object):
 
     screenx = 1024
-    screeny = 640
+    screeny = 800
     def __init__(self, width=screenx, height=screeny, fps=30):
         """Initialize pygame, window, background, font,...
            default arguments 
@@ -72,22 +72,22 @@ class PygView(object):
         
         
         
-        Cannon(750,240,180)
-        Cannon(750,440,180)
-        Cannon(950,440,180)
-        Cannon(950,240,180)
+        Cannon(int(750/1024*self.width),int(240/640*self.height),180)
+        Cannon(int(750/1024*self.width),int(440/640*self.height),180)
+        Cannon(int(950/1024*self.width),int(440/640*self.height),180)
+        Cannon(int(950/1024*self.width),int(240/640*self.height),180)
         
-        self.archernorth=Archer(500,40)
-        self.archersouth=Archer(500,600)
-        self.archermiddle=Archer(500,301)
+        self.archernorth=Archer(int(500/1024*self.width),int(40/640*self.height))
+        self.archersouth=Archer(int(500/1024*self.width),int(600/640*self.height))
+        self.archermiddle=Archer(int(500/1024*self.width),int(301/640*self.height))
         
-        Barrikade(440, 260, True)
-        Barrikade(440, 360, False)
+        Barrikade(int(440/1024*self.width),int(260/640*self.height), True)
+        Barrikade(int(440/1024*self.width),int(360/640*self.height), False)
         
         #Barrikade(440, 30, True)
-        Barrikade(440, 60, False)
+        Barrikade(int(440/1024*self.width), int(60/640*self.height), False)
         
-        Barrikade(440, 580 , True)
+        Barrikade(int(440/1024*self.width), int(580/640*self.height) , True)
        # Barrikade(440, 600 , False)
         
         
@@ -97,19 +97,19 @@ class PygView(object):
         """painting on the surface"""
         #------- try out some pygame draw functions --------
         # pygame.draw.rect(Surface, color, Rect, width=0): return Rect
-        # burg
-        pygame.draw.rect(PygView.background, (0,255,0), (750,240,200,200)) # rect: (x1, y1, width, height)
+        # burg                                           x 750/1024 * self..width
+        pygame.draw.rect(PygView.background, (0,255,0), (int(750/1024*self.width),int(240/640*self.height),int(200/1024*self.width),int(200/640*self.height))) # rect: (x1, y1, width, height)
         # pygame.draw.circle(Surface, color, pos, radius, width=0): return Rect
         # turm
-        pygame.draw.circle(PygView.background, (0,200,0), (750,240), 50) # turm links oben
-        pygame.draw.circle(PygView.background, (0,200,0), (750,440), 50) # turm links oben
-        pygame.draw.circle(PygView.background, (0,200,0), (950,440), 50) # turm links oben
-        pygame.draw.circle(PygView.background, (0,200,0), (950,240), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (int(750/1024*self.width),int(240/640*self.height)), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (int(750/1024*self.width),int(440/640*self.height)), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (int(950/1024*self.width),int(440/640*self.height)), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (int(950/1024*self.width),int(240/640*self.height)), 50) # turm links oben
         # pygame.draw.arc(Surface, color, Rect, start_angle, stop_angle, width=1): return Rect
         # mauer
-        pygame.draw.arc(PygView.background, (0,150,0),(600,0,150,600), math.pi/2,math.pi*1.5,10) 
+        pygame.draw.arc(PygView.background, (0,150,0),(int(600/1024*self.width),0,150,600), math.pi/2,math.pi*1.5,10) 
         # wasser
-        pygame.draw.arc(PygView.background, (5,66,156),(570,-20,150,620), math.pi/2,math.pi*1.5,20) 
+        pygame.draw.arc(PygView.background, (5,66,156),(int(570/1024*self.width),-20,150,620), math.pi/2,math.pi*1.5,20) 
         # ------------------- blitting a Ball --------------
         # pygame.draw.polygon(Surface, color, pointlist, width=0): return Rect
        # pygame.draw.polygon(PygView.background, (0,180,0), ((500,20),
