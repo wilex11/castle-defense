@@ -25,7 +25,7 @@ import random
 class PygView(object):
 
     screenx = 1024
-    screeny = 800
+    screeny = 640
     def __init__(self, width=screenx, height=screeny, fps=30):
         """Initialize pygame, window, background, font,...
            default arguments 
@@ -56,7 +56,7 @@ class PygView(object):
         self.friendlyprojectilegroup=pygame.sprite.Group()
         self.kratergroup=pygame.sprite.Group()
         self.barrikadegroup=pygame.sprite.Group()
-        
+        self.speargroup=pygame.sprite.Group()
         
         Cannon.groups=self.cannongroup, self.allgroup
         Bar.groups=self.bargroup,self.allgroup
@@ -67,27 +67,27 @@ class PygView(object):
         Arrow.groups=self.arrowgroup,self.allgroup,self.friendlyprojectilegroup
         Krater.groups=self.kratergroup,self.allgroup
         Barrikade.groups=self.barrikadegroup, self.allgroup
+        Spear.groups=self.speargroup, self.allgroup
         
         
         
         
+        Cannon(750,240,180)
+        Cannon(750,440,180)
+        Cannon(950,440,180)
+        Cannon(950,240,180)
         
-        Cannon(int(750/1024*self.width),int(240/640*self.height),180)
-        Cannon(int(750/1024*self.width),int(440/640*self.height),180)
-        Cannon(int(950/1024*self.width),int(440/640*self.height),180)
-        Cannon(int(950/1024*self.width),int(240/640*self.height),180)
+        self.archernorth=Archer(500,40)
+        self.archersouth=Archer(500,600)
+        self.archermiddle=Archer(500,301)
         
-        self.archernorth=Archer(int(500/1024*self.width),int(40/640*self.height))
-        self.archersouth=Archer(int(500/1024*self.width),int(600/640*self.height))
-        self.archermiddle=Archer(int(500/1024*self.width),int(301/640*self.height))
-        
-        Barrikade(int(440/1024*self.width),int(260/640*self.height), True)
-        Barrikade(int(440/1024*self.width),int(360/640*self.height), False)
+        Barrikade(440, 260, True)
+        Barrikade(440, 360, False)
         
         #Barrikade(440, 30, True)
-        Barrikade(int(440/1024*self.width), int(60/640*self.height), False)
+        Barrikade(440, 60, False)
         
-        Barrikade(int(440/1024*self.width), int(580/640*self.height) , True)
+        Barrikade(440, 580 , True)
        # Barrikade(440, 600 , False)
         
         
@@ -97,19 +97,19 @@ class PygView(object):
         """painting on the surface"""
         #------- try out some pygame draw functions --------
         # pygame.draw.rect(Surface, color, Rect, width=0): return Rect
-        # burg                                           x 750/1024 * self..width
-        pygame.draw.rect(PygView.background, (0,255,0), (int(750/1024*self.width),int(240/640*self.height),int(200/1024*self.width),int(200/640*self.height))) # rect: (x1, y1, width, height)
+        # burg
+        pygame.draw.rect(PygView.background, (0,255,0), (750,240,200,200)) # rect: (x1, y1, width, height)
         # pygame.draw.circle(Surface, color, pos, radius, width=0): return Rect
         # turm
-        pygame.draw.circle(PygView.background, (0,200,0), (int(750/1024*self.width),int(240/640*self.height)), 50) # turm links oben
-        pygame.draw.circle(PygView.background, (0,200,0), (int(750/1024*self.width),int(440/640*self.height)), 50) # turm links oben
-        pygame.draw.circle(PygView.background, (0,200,0), (int(950/1024*self.width),int(440/640*self.height)), 50) # turm links oben
-        pygame.draw.circle(PygView.background, (0,200,0), (int(950/1024*self.width),int(240/640*self.height)), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (750,240), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (750,440), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (950,440), 50) # turm links oben
+        pygame.draw.circle(PygView.background, (0,200,0), (950,240), 50) # turm links oben
         # pygame.draw.arc(Surface, color, Rect, start_angle, stop_angle, width=1): return Rect
         # mauer
-        pygame.draw.arc(PygView.background, (0,150,0),(int(600/1024*self.width),0,150,600), math.pi/2,math.pi*1.5,10) 
+        pygame.draw.arc(PygView.background, (0,150,0),(600,0,150,600), math.pi/2,math.pi*1.5,10) 
         # wasser
-        pygame.draw.arc(PygView.background, (5,66,156),(int(570/1024*self.width),-20,150,620), math.pi/2,math.pi*1.5,20) 
+        pygame.draw.arc(PygView.background, (5,66,156),(570,-20,150,620), math.pi/2,math.pi*1.5,20) 
         # ------------------- blitting a Ball --------------
         # pygame.draw.polygon(Surface, color, pointlist, width=0): return Rect
        # pygame.draw.polygon(PygView.background, (0,180,0), ((500,20),
@@ -275,11 +275,12 @@ class Monster(pygame.sprite.Sprite):
     
     def __init__(self,x,y,winkel=0):
         pygame.sprite.Sprite.__init__(self,self.groups)
+        self.shield=True
         self.image_attack=pygame.Surface((100,100))
-        self.image_attack.fill((255 ,255 ,255))
-        #mAle monster
+        self.image_attack.set_colorkey((0, 0, 0))
+        
         #body
-        pygame.draw.circle(self.image_attack,(33, 55, 33),(50,50),39)
+        pygame.draw.circle(self.image_attack,(100, 55, 33),(50,50),39)
         #head 
         pygame.draw.circle(self.image_attack,(0, 35, 0),(45,50),20)
         
@@ -289,20 +290,18 @@ class Monster(pygame.sprite.Sprite):
         # right arm
         pygame.draw.rect(self.image_attack,(113, 9, 9),(50,80,50,10))
         # left eye
-        pygame.draw.rect(self.image_attack,(255,0,8),(50,40,10.10,5))
+        pygame.draw.rect(self.image_attack,(255,0,0),(50,40,10.10,5))
         #right eye
-        pygame.draw.rect(self.image_attack,(255,0,8),(50,60,10.10,5))
+        pygame.draw.rect(self.image_attack,(255,0,0),(50,60,10.10,5))
         #self.image = pygame.transform.rotate(self.image,-90)
-        self.image_attack.set_colorkey((255,255,255))
-        self.image_attack=self.image_attack.convert_alpha()
+        self.image_attack.convert_alpha()
         
         
         
         #------------------
          
         self.image_shield=pygame.Surface((100,100))#
-        self.image_shield.fill((255,255,255))
-        
+        self.image_shield.set_colorkey((0,0,0))
          #body
         pygame.draw.circle(self.image_shield,(33, 55, 33),(50,50),39)  
         #head                                                                                                                                                                                                                   
@@ -312,35 +311,15 @@ class Monster(pygame.sprite.Sprite):
         # right arm
         pygame.draw.rect(self.image_shield,(113, 9, 9),(50,80,50,10))
         # left eye
-        pygame.draw.rect(self.image_shield,(255,0,8),(50,40,10.10,5))
+        pygame.draw.rect(self.image_shield,(0,0,255),(50,40,10.10,5))
         #right eye
-        pygame.draw.rect(self.image_shield,(255,0,8),(50,60,10.10,5))
+        pygame.draw.rect(self.image_shield,(0,0,255),(50,60,10.10,5))
         #shield
         pygame.draw.arc(self.image_shield,(134,134,134),(10,10,90,90),-math.pi/2,+math.pi/2,5)
-        self.image_shield.set_colorkey((255,255,255))
-        self.image_shield=self.image_shield.convert_alpha()
+        
+        
         # -------------------
-        
         self.image = self.image_shield
-        #self.image_attack.set_colorkey((255, 255, 255))
-        #self.image=self.image_attack.copy()
-        self.x=x
-        self.y=y
-        self.dx=0.0
-        self.dy=0.0
-        self.winkel=winkel
-        self.original=self.image.copy()
-        self.oldrect = self.original.get_rect()
-        self.image=pygame.transform.rotozoom(self.original, winkel, 1.0)
-        self.rect=self.image.get_rect()
-        self.oldrect.centerx = self.x
-        self.oldrect.centery = self.y
-        self.rect.centerx = self.x
-        self.rect.centery = self.y
-        self.shield=True
-        
-        
-        #self.image = self.image_shield#
         
         self.rect = self.image.get_rect()
         self.dx = random.randint(30,35)
@@ -363,12 +342,9 @@ class Monster(pygame.sprite.Sprite):
     def update(self, seconds):
         
         self.time += seconds
-        self.winkel = math.atan2(-self.dx, -self.dy)/math.pi*180.0 
-        self.image = pygame.transform.rotozoom(self.original,self.winkel+90,1.0)
-        self.rect = self.image.get_rect()
-        self.rect.centerx=self.x
-        self.rect.centery=self.y
         if self.shield:
+			# ducken und vorrücken SHIELD
+            self.image=self.image_shield
             
             
             self.x += self.dx * seconds
@@ -378,6 +354,13 @@ class Monster(pygame.sprite.Sprite):
                self.shield = False
                self.time= 0
         else:
+			# stehen und angreifen ATTACK
+            self.image=self.image_attack
+            # auf welchen bogenschützen schießen?
+            targets = [ ( 500,40) , ( 500,600) , (500,301) ,(750,240) ,(750,440) ,(950,440) ,(950,240) ]
+            target=random.choice(targets)
+            if random.randint(1,20) == 1:
+                Spear(self.x, self.y, target[0] + random.randint(-30,30), target[1] + random.randint(-30,30))
             if self.time> self.attack_duration:
                 self.shield=True
                 self.time=0
@@ -615,6 +598,65 @@ class Arrow (pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self,self.groups) #!!!!!!!!!!
         self.image0=pygame.Surface((20,20))
         pygame.draw.line(self.image0,(100,83,81),(10,0),(10,20),3)
+        self.image0.set_colorkey((0,0,0))
+        self.image0=self.image0.convert_alpha()
+        self.rect = self.image0.get_rect()
+        self.image=self.image0.copy()
+        self.gravity=-9.81
+        self.x=x
+        self.y=y
+        self.z=0
+        self.dx=0
+        self.dy=0
+        self.dz=0.7
+        self.killzone = 300.0 # Höhe, ab wann kugel monster tötet
+        self.maxspeed = 10.5
+        self.targetx = targetx
+        self.targety = targety
+        distancex = self.targetx - self.x
+        distancey = self.targety - self.y
+        distance = ( distancex**2 + distancey**2)**0.5
+        self.damage=3
+        
+        try:
+            self.dz = 10.3* ((self.gravity*-1)/(2*self.maxspeed**2 )) * distance
+            #self.dz=0.7
+        except:
+            print("division by zero?")
+        self.dx = distancex / distance
+        self.dy = distancey / distance
+        self.dx *= self.maxspeed
+        self.dy *= self.maxspeed  
+        self.angle = math.atan2(-self.dx, -self.dy)/math.pi*180.0  # - math.pi/2
+        
+        self.image = pygame.transform.rotozoom(self.image0,self.angle,1.0)
+        
+    def update(self, seconds):
+        self.x=self.x + self.dx
+        self.y=self.y + self.dy
+        self.z=self.z + self.dz
+        if self.x < 0:
+            self.kill()
+        if self.y < 0:
+            self.kill()
+        if self.x> PygView.screenx:
+            self.kill()
+        if self.y> PygView.screeny:
+            self.kill()     
+        if self.z < 0:
+            self.kill()             
+        self.image=pygame.transform.rotozoom(self.image0, self.angle, 1+self.z/1000.0)   
+        #self.image = pygame.transform.rotozoom(self.image,self.angle,1.0)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.x
+        self.rect.centery = self.y
+        self.dz+=self.gravity
+         
+class Spear (pygame.sprite.Sprite):
+    def __init__(self, x,y, targetx, targety):
+        pygame.sprite.Sprite.__init__(self,self.groups) #!!!!!!!!!!
+        self.image0=pygame.Surface((50,50))
+        pygame.draw.line(self.image0,(113,56,56),(25,0),(25,35),3)
         self.image0.set_colorkey((0,0,0))
         self.image0=self.image0.convert_alpha()
         self.rect = self.image0.get_rect()
